@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js">
+</script>
+<script>
+
+    $(document).ready(function(){
+        var userid=sessionStorage.getItem("userid");
+        getuser();
+        $("#left_button").click(function(){
+            tryapitest1();
+
+        });
+        $("#bt_skip").click(function(){
+            tryapitest2();
+
+        });
+        $("#right_botton").click(function(){
+            tryapitest3();
+
+        });
+    });
+
+    function getuser(){
+        var userid=sessionStorage.getItem("userid");
+        var obj2 = {"userID":userid}
+        $.ajax({
+            url: "/user/getuser",
+            contentType: "application/json",
+            data: JSON.stringify(obj2),
+            type: "POST",
+            success: function (result) {
+                console.log(JSON.stringify(result.list[0].name));
+                document.getElementById("teaname").innerHTML="您好！"+result.list[0].name;
+                console.log(JSON.stringify(result.list[0].serial));
+                // console.log(JSON.stringify(result.list[0].stem));
+                // document.getElementById("yuyintxt").innerHTML=result.stem;
+                // document.getElementById("num").innerHTML=result.serial+".";
+                document.getElementById("bot-box-input").value=result.list[0].serialID;
+                window.sessionStorage.setItem("username",result.list[0].name);
+            }
+        });
+        var obj3 = {"userid": userid}
+        $.ajax({
+            url: "/learn/getOne",
+            contentType: "application/json",
+            data: JSON.stringify(obj3),
+            type: "POST",
+            success: function (result) {
+                document.getElementById("yuyintxt").innerHTML=result.list[0].leaStem;
+                document.getElementById("num").innerHTML=result.list[0].learnSer + ".";
+            }
+        });
+    }
+
+    function tryapitest1(){
+
+        var aaa = document.getElementById("aaa");
+        if(aaa != null){
+            aaa.remove();
+        }
+
+        var serial = document.getElementById("bot-box-input").value;
+        if (serial == 1){
+            alert("当前已是第一题。")
+            return false
+        }
+        tryapitest11();
+        var obj = {
+            serial:serial-1,
+
+        }
+        $.ajax({
+            url: "/learn/getOneByserial",
+            contentType: "application/json",
+            data: JSON.stringify(obj),
+            type: "POST",
+            success: function (result) {
+                //console.log(result)
+                if (result.code == 200) {
+                    // window.location.href = "……";
+                    // alert(result.list);
+                    var str = result.list;
+                    document.getElementById("yuyintxt").innerHTML=result.list[0].leaStem;
+                    document.getElementById("num").innerHTML=result.list[0].learnSer + ".";
+                    document.getElementById("bot-box-input").value=result.list[0].learnSer;
+                } else {
+                    alert(result.message);
+                }
+            },
+        });
+
+    }
+    function tryapitest2(){
+
+        var aaa = document.getElementById("aaa");
+        if(aaa != null){
+            aaa.remove();
+        }
+        var serial = document.getElementById("bot-box-input").value;
+        var temp=serial-1;
+        if(document.getElementById("bot-box-input").value<1||serial > 285){
+            alert("请不要超出题目范围。")
+            return false;
+        }else if(isNaN(serial)){
+            alert("请不要输入特殊符号以及汉字内容。")
+            return false;
+        }
+
+        $(function (){tryapitest22()});
+        var obj = {
+            serial:serial,
+        }
+
+        $.ajax({
+            url: "/learn/getOneByserial",
+            contentType: "application/json",
+            data: JSON.stringify(obj),
+            type: "POST",
+            success: function (result) {
+                //console.log(result)
+                if (result.code == 200) {
+                    // window.location.href = "……";
+                    // alert(result.list);
+                    var str = result.list;
+                    document.getElementById("yuyintxt").innerHTML=result.list[0].leaStem;
+                    document.getElementById("num").innerHTML=result.list[0].learnSer + ".";
+                    document.getElementById("bot-box-input").value=result.list[0].learnSer;
+
+                } else {
+                    alert(result.message);
+                }
+            },
+        });
+    }
+    function tryapitest3(){
+
+        var aaa = document.getElementById("aaa");
+        if(aaa != null){
+            aaa.remove();
+        }
+
+        var serial = document.getElementById("bot-box-input").value;
+        if(document.getElementById("bot-box-input").value==285){
+            alert("当前已是最后一题。");
+            return false;
+        }
+        tryapitest33();
+        var obj = {
+            serial:serial-(-1),
+        }
+
+        $.ajax({
+            url: "/learn/getOneByserial",
+            contentType: "application/json",
+            data: JSON.stringify(obj),
+            type: "POST",
+            success: function (result) {
+                //console.log(result)
+                if (result.code == 200) {
+                    // window.location.href = "……";
+                    // alert(result.list);
+                    var str = result.list;
+                    document.getElementById("yuyintxt").innerHTML=result.list[0].leaStem;
+                    document.getElementById("num").innerHTML=result.list[0].learnSer + ".";
+                    document.getElementById("bot-box-input").value=result.list[0].learnSer;
+
+                } else {
+                    alert(result.message);
+                }
+            },
+        });
+    }
+    function tryapitest11(){
+        var serial = document.getElementById("bot-box-input").value;
+        serial=serial-1;
+        var temp=window.sessionStorage.getItem("userid");
+        var obj = {"serial":serial,"userid":temp}
+        $.ajax({
+            url: "/user/setserialID",
+            contentType: "application/json",
+            data: JSON.stringify(obj),
+            type: "POST",
+            success: function (result) {
+                console.log(result)
+                if (result.code == 200) {
+
+                } else {
+                    alert(result.message);
+                }
+            },
+        });
+
+    }
+    function tryapitest22(){
+        var serial = document.getElementById("bot-box-input").value;
+        serial=serial;
+        var name = document.getElementById("teaname").value;
+        var temp=window.sessionStorage.getItem("userid");
+
+
+        var obj = {"serial":serial,"userid":temp}
+        $.ajax({
+            url: "/user/setserialID",
+            contentType: "application/json",
+            data: JSON.stringify(obj),
+            type: "POST",
+            success: function (result) {
+                console.log(result)
+                if (result.code == 200) {
+
+                } else {
+                    alert(result.message);
+                }
+            },
+        });
+
+    }
+    function tryapitest33(){
+        var serial = document.getElementById("bot-box-input").value;
+        serial=serial-(-1);
+        var name = document.getElementById("teaname").value;
+        var temp=window.sessionStorage.getItem("userid");
+
+        var obj = {"serial":serial,"userid":temp}
+        $.ajax({
+            url: "/user/setserialID",
+            contentType: "application/json",
+            data: JSON.stringify(obj),
+            type: "POST",
+            success: function (result) {
+                console.log(result)
+                if (result.code == 200) {
+
+                } else {
+                    alert(result.message);
+                }
+            },
+        });
+    }
+    function returnIndex() {
+        window.location.href = "http://112.126.85.136:8088/subsystem.html";
+    }
+</script>
+<!--{#<script src="http://39.97.121.129:8888/question/get"></script>#}-->
+<script src="/js/123.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/bootstrap.js"></script>
+
+<head>
+    <meta charset="utf-8"/>
+    <title></title>
+    <style>
+        .all {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            min-width: 100px;
+            z-index: -10;
+            zoom: 1;
+            background-color: #fff;
+            background: url(/image/background1.png);
+            background-repeat: no-repeat;
+            background-size: cover;
+            -webkit-background-size: cover;
+            -o-background-size: cover;
+            background-position: center 0;
+
+        }
+
+        .bg-blur {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, .7);
+        }
+
+        .head-box p {
+            margin-top: 20px;
+            font-size: 45px;
+            text-align: justify;
+        }
+
+        .head-box button {
+            margin-top: 20px;
+            width: 60px;
+            height:60px;
+        }
+        .head-box img{
+            width: 100%;
+            height: 100%;
+        }
+        .head-box {
+            margin-top: 40px;
+        }
+        .mid-box{
+            overflow: auto;
+            height: 50%;
+            margin-left: 0px;
+        }
+
+        .mid-box p {
+            margin-top: 100px;
+            font-size: 40px;
+            text-align: justify;
+        }
+        .bot-box {
+            position: absolute;bottom:50px;
+        }
+        .bot-box input {
+            margin-top: 100px;
+            height: 69px;
+            font-size: 40px;
+            text-align: right;
+        }
+
+        .bot-box button {
+            margin-top: 100px;
+            font-size: 40px;
+        }
+
+        .bot-box p {
+            margin-top: 100px;
+            font-size: 50px;
+        }
+        input{
+            width: 30px;
+            height: 30px;
+            float: right;
+        }
+    </style>
+</head>
+
+<body>
+<div class="all" id="all">
+    <div class="bg-blur" id="bg-blur">
+        <img src="/image/head.jpg"/>
+
+        <div class="head-box" id="head-box">
+            <div class="col-xs-3">
+<!--                <button class="btn btn-info" style="width: 100%; border-radius: 0.5px 0; font-size: 30px" onclick="returnIndex()">返回首页</button>-->
+                <div id="back_select"><img  src="/image/back.png" style="width: 45px; height: 45px; margin-left: 3rem; float: left;"/></div>
+            </div>
+            <div id="head-box-id">
+                <p class="col-xs-5" id="teaname"></p>
+            </div>
+            <div><button id="play" class="col-xs-offset-2"><img src="/image/喇叭.png" ></button></div>
+        </div>
+
+        <div id="chech" class="col-xs-offset-8 col-xs-4">
+            <p  style="font-size: 30px; width: 240px; margin-right: 0px; float: left; text-align: right;">开启自动播放:</p>
+            <input type="checkbox" id="checkbox-id" />
+        </div>
+        <div class="mid-box col-xs-10" id="head-box">
+            <p class="col-xs-2" id="num" style="text-align: right;"></p>
+            <div class="col-xs-10 " id="head-box-subject">
+                <p id="yuyintxt">
+
+                </p>
+            </div>
+        </div>
+        <div class="bot-box col-xs-offset-1" id="bot-box">
+            <button type="button" class="btn btn-default col-xs-1 col-xs-offset-1" id="left_button">
+                <img src="/image/翻页1.png"style="width: 30px;"></button>
+            <input type="text" id="bot-box-input" name="bot-box-input"  class="col-xs-2 col-xs-offset-1"/>
+
+            <p class="col-xs-2" id="max">/285</p>
+            <button type="button" class="btn btn-default col-xs-2" id="bt_skip">跳转</button>
+            <button type="button" class="btn btn-default col-xs-1 col-xs-offset-1" id="right_botton">
+                <img src="/image/翻页2.png" style="width: 30px;"></button>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" >
+    // 检查浏览器支持
+    // if ('speechSynthesis' in window) {
+    //     $(function () {
+    //         // 使用计时器异步获取语音包
+    //         var langsInterval = setInterval(() => {
+    //             // 设置语言
+    //             var langs = window.speechSynthesis.getVoices();
+    // 			lang = "zh-CN"
+    //         }, 1000);
+    //     });
+    //
+    //     $("#play").on('click', function (e) {
+    //         //var text = $("p").html();
+    // 		var text =document.getElementById("yuyintxt").innerHTML;
+    // 		var msg = new SpeechSynthesisUtterance();
+    // 		msg.text = text;
+    // 		msg.lang = $("#langs").val();
+    //         window.speechSynthesis.speak(msg);
+    //     });
+    // } else {
+    //     // Ah man, speech synthesis isn't supported.
+    //     alert("抱歉浏览器不支持语音合成朗读")
+    // }
+    // 百度语音合成
+    $('#play').on('click', function (e) {
+
+        var aaa = document.getElementById("aaa");
+        if(aaa != null){
+            aaa.remove();
+        }
+
+        var ttsUrl = 'https://tts.baidu.com/text2audio?';
+        var ttsText = document.getElementById("yuyintxt").innerHTML;
+        //alert(ttsText)
+        // 处理参数
+        var urlParameter = [];
+        urlParameter.push('lan=zh');
+        urlParameter.push('pdt=301');
+        urlParameter.push('vol=9');
+        urlParameter.push('per=0');
+        urlParameter.push('cuid=baike');
+        urlParameter.push('ctp=1');
+        urlParameter.push('tex=' + encodeURIComponent(ttsText));
+        var address = ttsUrl + urlParameter.join('&');
+
+        // 如果浏览器支持，可以设置autoplay，但是不能兼容所有浏览器
+        var audio = document.createElement('audio');
+
+        audio.setAttribute("id","aaa");
+
+        audio.autoplay = true;
+        audio.preload = true;
+        audio.controls = true;
+        audio.src = address;
+        audio.addEventListener('ended',async function () {
+            // 设置则播放完后移除audio的dom对象
+            document.body.removeChild(audio);
+
+            //终端判断
+            var u = navigator.userAgent;
+            var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+
+            var p = $("#checkbox-id").prop('checked');
+            //alert(p);
+            if(p){
+                var temp = await sleep(3000);
+                //alert("22222");
+                tryapitest3();
+                var temp = await sleep(2000);
+                if(isiOS){
+                    //alert("stop");
+                    //$("#play").trigger("click");
+                    $("#play").trigger("click");
+                }
+                else {
+                    $("#play").trigger("click");
+                }
+
+            }
+
+        }, false);
+
+        audio.addEventListener('error', function () {
+            document.body.removeChild(audio);
+            console.log('合成出错url：' + address + '\nAudio错误码：' + audio.error.code);
+        }, false);
+        audio.loop = false;
+        audio.volume = 1;
+        // 在body元素下apppend音频控件
+        document.body.append(audio);
+
+
+    });
+
+    function sleep(ms) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, ms);
+        });
+    }
+
+</script>
+<script>
+    $("#back_select").click(function (){
+        // 返回子系统选择页面前，将当前题数归零
+
+        // window.sessionStorage.setItem("item","0");
+        //window.location.href = "http://localhost:8088/subsystem.html";
+        window.location.href = "http://112.126.85.136:8088/subsystem.html";
+
+    });
+</script>
+</html>

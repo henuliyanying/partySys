@@ -1,0 +1,30 @@
+/* body {
+
+  background-image: url(../image/bac5.jpg);
+
+  background-position: center 0;
+
+  background-repeat: no-repeat;
+
+  background-attachment: fixed;
+
+  background-size: cover;
+
+  -webkit-background-size: cover;
+
+  -o-background-size: cover;
+
+  -moz-background-size: cover;
+
+  -ms-background-size: cover;
+
+} */
+html,body{height: 100%;width: 100%;margin:0;padding:0;}
+body {
+    background: url(../image/bac4.jpg) no-repeat;
+    width: 100%;
+    height: 100%;
+    background-size: 100% 100%;
+    position: absolute;
+    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='bg-login.png', sizingMethod='scale');
+}

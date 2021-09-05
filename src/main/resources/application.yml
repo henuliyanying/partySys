@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: partySys
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    name: party
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/party?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+  resources:
+    static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/templates/,classpath:/static/,classpath:/public/,file:${web.upload-path}
+    chain:
+      strategy:
+        content:
+          enabled: true
+          paths: /**
+mybatis:
+  type-aliases-package: com.example.demo.eneities
+  mapper-locations: classpath:Mybatis/mapper/*.xml
+
+server:
+  port: 8088

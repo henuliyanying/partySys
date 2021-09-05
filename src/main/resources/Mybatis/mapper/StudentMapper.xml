@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.StudentMapper">
+    <select id="getAll" resultType="Student">
+        select * from student
+    </select>
+    <select id="checkUser" resultType="java.lang.Boolean">
+        select userID from student where userID=#{userID}
+    </select>
+    <select id="getSerialNum" resultType="Student">
+        select * from student where userID=#{userID}
+    </select>
+    <update id="updateSerialNum" parameterType="Student">
+        update student set serialID=#{serialID} where userID=#{userID}
+    </update>
+    <update id="updateAnswerSum" parameterType="Student">
+        update student set answerSum=#{answerSum} where userID=#{userID}
+    </update>
+    <update id="updateAnsRiSum" parameterType="Student">
+        update student set ansRiSum=#{ansRiSum} where userID=#{userID}
+    </update>
+    <update id="updateQuesserial" parameterType="Student">
+        update student set quesserialA=#{quesserialA}, quesserialB=#{quesserialB}, quesserialC=#{quesserialC}where userID=#{userID}
+    </update>
+    <update id="updUser" parameterType="Student">
+        update student set name=#{name}, serialID=#{serialID}, answerSum=#{answerSum}, ansRiSum=#{ansRiSum}, quesserialA=#{quesserialA}, quesserialB=#{quesserialB}, quesserialC=#{quesserialC} where userID=#{userID}
+    </update>
+</mapper>

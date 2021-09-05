@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>成绩页面</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<!--	<link rel="stylesheet" href="/css/csstest/bootstrap.min.css">-->
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<!--	<script src="/js/bootstrap.min.js"></script>-->
+	<script src="js/circleChart.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<!--  <link rel="stylesheet" href="css/chartcss.css">-->
+</head>
+<style>
+	html,body{height: 100%;width: 100%;margin:0;padding:0;}
+	body{
+		background:url(/image/bac4.jpg) no-repeat;
+		width:100%;
+		height:100%;
+		background-size:100% 100%;
+		position:absolute;
+		filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='bg-login.png',sizingMethod='scale');
+</style>
+<script>
+	$(function(){
+		getGrade();
+	});
+
+	function getGrade(){
+		var finalScores=sessionStorage.getItem("finalScores");
+		var rightScores=10-finalScores;
+		document.getElementById("perright").innerHTML = rightScores*10;
+		//设置本次考试正确率
+		var i = (rightScores*10);
+		// var i =0;
+		// var i = 0;
+		if(i == 0){
+			i = "";
+		}
+		//给圆形百分比设置此时的正确率
+		$(".circleChart").circleChart({
+			value: i,
+		});
+		//设置本次考试”答对题数“
+		document.getElementById('numright').innerHTML=rightScores;
+		//设置本次考试”答错题数“
+		document.getElementById('numerror').innerHTML=finalScores;
+		//设置本次考试分值
+		document.getElementById('nowaverage').innerHTML=rightScores;
+		var userID=sessionStorage.getItem("userid");
+		var obj = {
+			userID: userID,
+		}
+		$.ajax({
+			url: "/user/getuser",
+			contentType: "application/json",
+			data: JSON.stringify(obj),
+			type: "POST",
+			success: function (result) {
+				// console.log(result);
+				if (result.code == 200) {
+					//设置一共做了多少套卷
+					document.getElementById('allpaper').innerHTML=(result.list[0].answerSum)/(10);
+					//设置所有考试的平均分
+					document.getElementById('allaverage').innerHTML=((result.list[0].ansRiSum*10)/(result.list[0].answerSum)).toFixed(2);
+				} else {
+					alert(result.message);
+				}
+			}
+		});
+	}
+	function returnIndex() {
+		 window.location.href = "http://112.126.85.136:8088/subsystem.html";
+		//window.location.href = "http://localhost :8088/subsystem.html";
+	}
+	function returnTest() {
+		var firstname=sessionStorage.getItem("userid");
+		var obj = {
+			userID: firstname,
+		}
+		$.ajax({
+			url: "/question/getQues",
+			contentType: "application/json",
+			data: JSON.stringify(obj),
+			type: "POST",
+			success: function (result) {
+				console.log(result.code);
+				if (result.code == 200) {
+					var questions=result.list;
+					window.sessionStorage.setItem('list',JSON.stringify(questions));
+					window.sessionStorage.setItem("item","0");
+					sessionStorage.setItem("error","@");
+					window.location.href = "http://112.126.85.136:8088/test.html";
+					//window.location.href = "http://localhost:8088/test.html";
+
+				} else {
+					alert(result.message);
+				}
+			}
+		});
+
+	}
+</script>
+<body>
+<div class="container">
+	<!-- 圆形百分比进度条开始 -->
+	<div class="page-header">
+		<h4 style="text-align: center;" >测评成绩</h4>
+		<div class="circleChart" id="0"></div>
+		<h5 style="text-align: center;">本次考试正确率为：
+			<span id="perright"></span>%
+		</h5>
+		<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+		<script src="js/circleChart.min.js"></script>
+		<script>
+			var finalScores=sessionStorage.getItem("finalScores");
+			var rightScores=10-finalScores;
+			$(".circleChart#0").circleChart({
+				size: 120,
+				value: 1,
+				startAngle: -25,
+				color: "#ec3d49", // 进度条颜色
+				// backgroundColor: "#DDDADA",  // 进度条之外颜色
+				// background: true, // 是否显示进度条之外颜色
+				text: 18,
+				unit: "percent",
+				onDraw: function(el, circle) {
+					circle.text(Math.round(circle.value) + "%");
+				}
+			});
+		</script>
+	</div>
+	<!-- 圆形百分比进度条结束-->
+	<div class="row" style="margin-right:0.3rem;margin-left: 0.3rem;margin-top: 2rem;">
+		<table class="table table-bordered">
+			<caption>本次答题情况</caption>
+			<tr>
+				<td class="active" width="26%" ><b>答对题数</b></td>
+				<td>
+					<span id="numright"></span>
+				</td>
+				<td class="active" width="26%"><b>答错题数</b></td>
+				<td>
+					<span id="numerror"></span>
+				</td>
+			</tr>
+			<tr>
+				<td class="active" width="25%"><b>试题总数</b></td>
+				<td>10</td>
+				<td class="active" width="25%"><b>考试总分</b></td>
+				<td>
+					<span id="nowaverage"></span>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+<!-- <div style="text-align: center; margin-top: 0.8rem;">
+    <button type="button" class="btn btn-danger">继续测试</button>
+    <button type="button" class="btn btn-default">返回首页</button>
+</div> -->
+<div class="panel panel-danger" style="margin-left: 1.5rem;margin-right: 1.5rem;">
+	<div class="panel-heading">
+		<h3 class="panel-title">测试平均分统计</h3>
+	</div>
+	<div class="panel-body">
+		共做
+		<span id="allpaper"></span>
+		套卷，平均分为
+		<span id="allaverage"></span>
+		分
+	</div>
+</div>
+<footer class="footer navbar-fixed-bottom ">
+	<div class="col-xs-6" style="padding: 0;">
+		<button type="button" class="btn btn-info" style="width: 100%; border-radius: 0.5px 0;" onclick="returnIndex()">返回首页</button>
+	</div>
+	<div class="col-xs-6" style="padding: 0;">
+		<button type="button" class="btn btn-danger" style="width: 100%;border-radius: 0.5px 0;" onclick="returnTest()">继续测试</button>
+	</div>
+</footer>
+</body>
+</html>

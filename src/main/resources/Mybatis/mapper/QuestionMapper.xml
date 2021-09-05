@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.QuestionMapper">
+    <select id="getAllQuestion" resultType="question">
+        select * from question
+    </select>
+    <select id="EgetOneQuestion" resultType="question">
+        select * from question where quesserial=#{quesserial}
+    </select>
+</mapper>

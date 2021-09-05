@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>答题</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/css/style.css" />
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<style>
+	html,body{height: 100%;width: 100%;margin:0;padding:0;}
+	body{
+		background:url(../image/bac8.jpg)no-repeat;
+		width:100%;
+		height:100%;
+		background-size:100% 100%;
+		position:absolute;
+		filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='bg-login.png',sizingMethod='scale');
+</style>
+<body>
+<div>
+	<img src="./image/head.jpg"  style="width: 100%; " />
+</div>
+<div style="width:100%;position: absolute;bottom: 0;left: 50%;transform: translate(-50%, -50%);">
+	<div id="confirm" style="visibility: hidden;text-align: center;width: 70%;height: auto;margin-left:15%; border-radius: 20px;border: 2px solid #e3e3e3;background: #ffffff">
+		<p style="margin-top: 10px">您确定要结束答题并返回菜单页面么？答题记录将不会保存。</p>
+		<div style="margin-top: 40px;margin-bottom: 10px">
+			<button id="yes" style="text-align: center;border-radius: 10px;border: 2px solid #e3e3e3;margin-right: 10px">确定</button>
+			<button id="no" style="text-align: center;border-radius: 10px;border: 2px solid #e3e3e3;">取消</button>
+		</div>
+
+	</div>
+</div>
+
+<br>
+<div id="back_select"><img  src="/image/back.png" style="width: 20px; height: 20px; margin-left: 3rem; float: left;"/></div>
+
+<div class="container" style="margin-top: 3rem;">
+	<div class="panel panel-default">
+
+		<div class="panel-heading" style="font-size: 1.7rem; ">
+			<span id="span_tiankongti" style="font-size: 1.3rem; ">填空题</span>
+			<span style="float: right;">
+				<span  id="curr_que_num">1</span>
+			</span>
+		</div>
+		<div class="panel-body" >
+			<p id="que_content"></p>
+			<p id="lastInformation"></p>
+		</div>
+	</div>
+	<div style="text-align: center;">
+		<button id="bt_next" type="button" class="btn btn-warning " style="width: 70%;">下一题</button>
+		<button id="bt_submit" type="button" class="btn btn-warning " style="width: 70%; visibility: hidden;">提交</button>
+	</div>
+</div>
+<!-- <div align="center">Copyright &copy; 2014.Company name All rights reserved.</div> -->
+<!-- Javascript -->
+<script src=/js/jquery-1.8.2.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.backstretch.min.js"></script>
+<!--<script src="/js/scripts.js"></script>-->
+
+<script>
+	// 监听三个按钮分别跳转到不同的页面
+	$("#back_select").click(function (){
+
+		document.getElementById("confirm").style.visibility='visible';
+		$("#yes").click(function () {
+			// 返回子系统选择页面前，将当前题数归零
+
+			window.sessionStorage.setItem("item","0");
+			//window.location.href = "http://localhost:8088/subsystem.html";
+			 window.location.href = "http://112.126.85.136:8088/subsystem.html";
+			// window.location.href = "http://localhost:8088/subsystem.html";
+		});
+		$("#no").click(function () {
+			document.getElementById("confirm").style.visibility='hidden';
+		})
+
+
+	});
+
+	$(document).ready(function(){
+		var item=sessionStorage.getItem("item");
+
+		if(item==10){
+			document.getElementById("bt_next").style.display='none';
+			document.getElementById("bt_submit").style.visibility='visible';
+			document.getElementById("span_tiankongti").style.visibility='hidden';
+			document.getElementById("curr_que_num").style.visibility='hidden';
+
+			$("#lastInformation").text("恭喜您，已完成本次测试！");
+			// sessionStorage.setItem("item","0");
+
+		}else{
+			var parse_list=JSON.parse(sessionStorage.getItem('list'));
+			var que_content=parse_list[item].quesStem.trim();
+			// $("#question_serial").text(parse_list.que[item].serial+".");
+			var curr_num=parseInt(item)+1;
+			$("#curr_que_num").text(curr_num+"/10");
+			var stern_split=que_content.split("#");
+			if(stern_split[1]==""){
+				$("#que_content").after(stern_split[0]+"<input/>");
+			}else{
+				$("#que_content").after(stern_split[0]+"<input/>"+stern_split[1]);
+			}
+
+
+			$("#bt_next").click(function(){
+				//获取用户的输入值
+				var value=$("input").val();
+				//当用户输出不正确的时候提示正确信息，直到填对才挑战下一题
+				if(value!=(parse_list[item].quesAns)){
+					alert("正确答案为:"+parse_list[item].quesAns);
+					//清空输入框
+					//将输入框清空
+					// $("input").val("");
+
+					//向session里存储错题
+					var temp=sessionStorage.getItem("error");
+					var serial=parse_list[item].quesserial;
+					var temp2=temp+"#"+serial;
+					// alert("temp1:"+temp2);
+					sessionStorage.setItem("error",temp2);
+
+					// window.location.reload();
+				}else if(value==(parse_list[item].quesAns)){
+
+
+					// alert(sessionStorage.getItem("question"+item));
+					//每次点击题数加1
+					item++;
+					//更新session中当前题数
+					sessionStorage.setItem("item",item);
+					//将输入框清空
+					$("input").val("");
+					//重新加载页面
+					window.location.reload();
+				}
+
+
+			});
+		}
+
+		$("#bt_submit").click(function(){
+			$("#lastInformation").text("");
+			var re=sessionStorage.getItem("error");
+			var userid=sessionStorage.getItem("userid");
+			var split1=re.split("@");
+			var split2=split1[1].split("#");
+			var final_resoult=Array.from(new Set(split2));
+			var finalScores=parseInt(final_resoult.length-1);
+			sessionStorage.setItem("finalScores",finalScores);
+			var obj = {
+				wrong: re+"#"+userid,
+			}
+			// alert(obj)
+			$.ajax({
+				url: "/studAns/setStuAns",
+				contentType: "application/json",
+				data: JSON.stringify(obj),
+				type: "POST",
+				success: function (result) {
+					console.log(result.code);
+					if (result.code == 200) {
+						//alert(result.code)
+						//window.location.href = "http://112.126.85.136:8080/answer.html";
+						//window.location.href = "http://39.97.121.129:8080/answer.html";
+						window.location.href = "http://112.126.85.136:8088/gradetest.html";
+
+					} else {
+						alert(result.message);
+					}
+				}
+			});
+
+			var right=10-finalScores;
+			var stu_obj={
+				"right":right,
+				"userID":userid,
+			}
+			//更新学生信息
+
+			$.ajax({
+				url: "/user/updUser",
+				contentType: "application/json",
+				data: JSON.stringify(stu_obj),
+				type: "POST",
+				success: function (result) {
+					console.log(result.code);
+					if (result.code == 200) {
+
+					} else {
+						alert(result.message+"更新学生试题信息失败");
+					}
+				}
+			});
+
+		});
+
+	});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>成绩页面</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+	<!--	<link rel="stylesheet" href="/css/csstest/bootstrap.min.css">-->
+	<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+	<!--	<script src="/js/bootstrap.min.js"></script>-->
+	<script src="js/circleChart.min.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<!--  <link rel="stylesheet" href="css/chartcss.css">-->
+</head>
+<style>
+	html,body{height: 100%;width: 100%;margin:0;padding:0;}
+	body{
+		background:url(/image/partybg1.jpg) no-repeat;
+		width:100%;
+		height:100%;
+		background-size:100% 100%;
+		position:absolute;
+		filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='bg-login.png',sizingMethod='scale');
+</style>
+<script>
+	$(function(){
+		getGrade();
+		getA();
+	});
+	function getA() {
+
+		$.ajax({
+			url: "/user/getAvgTop",
+			contentType: "application/json",
+			data: JSON.stringify(),
+			type: "POST",
+			success: function (result) {
+				console.log(result.code);
+				if (result.code == 200) {
+					//var rank=result.list;
+					//设置排名第一
+					document.getElementById('ave_first').innerHTML= result.list[0].toFixed(2);
+					//document.getElementById('ave_first').innerHTML=Math.round(result.list[0]);
+					//设置排名第二
+					document.getElementById('ave_second').innerHTML= result.list[1].toFixed(2);
+					//document.getElementById('ave_second').innerHTML=Math.round(result.list[1]);
+					//设置排名第三
+					document.getElementById('ave_final').innerHTML= result.list[2].toFixed(2);
+					//document.getElementById('ave_final').innerHTML=Math.round(result.list[2]);
+
+				} else {
+					alert(result.message);
+				}
+			}
+		});
+		$.ajax({
+			url: "/user/getSumTop",
+			contentType: "application/json",
+			data: JSON.stringify(),
+			type: "POST",
+			success: function (result) {
+				console.log(result.code);
+				if (result.code == 200) {
+					//var rank=result.list;
+					//设置排名第一
+					document.getElementById('total_first').innerHTML=(result.list[0]);
+					//设置排名第二
+					document.getElementById('total_second').innerHTML=(result.list[1]);
+					//设置排名第三
+					document.getElementById('total_final').innerHTML=(result.list[2]);
+
+				} else {
+					alert(result.message);
+				}
+			}
+		});
+	}
+	function getGrade(){
+		var userID=sessionStorage.getItem("userid");
+		var obj = {
+			userID: userID,
+		}
+		$.ajax({
+			url: "/user/getuser",
+			contentType: "application/json",
+			data: JSON.stringify(obj),
+			type: "POST",
+			success: function (result) {
+				// console.log(result);
+				if (result.code == 200) {
+					//设置用户名
+					document.getElementById('user_label').innerHTML=(sessionStorage.getItem("userid"));
+
+					//设置一共做了多少套卷
+					document.getElementById('allpaper').innerHTML=(result.list[0].answerSum)/(10);
+					//设置所有考试的平均分
+					if(result.list[0].answerSum!=0){
+						document.getElementById('allaverage').innerHTML=((result.list[0].ansRiSum*10)/(result.list[0].answerSum)).toFixed(2);
+
+					}else {
+						document.getElementById('allaverage').innerHTML= 0;
+
+					}
+					document.getElementById('sum').innerHTML = result.list[0].ansRiSum;
+				} else {
+					alert(result.message);
+				}
+			}
+		});
+	}
+	function returnIndex() {
+		window.location.href = "http://112.126.85.136:8088/subsystem.html";
+		//window.location.href = "http://localhost:8088/subsystem.html";
+	}
+	function returnTest() {
+		var firstname=sessionStorage.getItem("userid");
+		var obj = {
+			userID: firstname,
+		}
+		$.ajax({
+			url: "/question/getQues",
+			contentType: "application/json",
+			data: JSON.stringify(obj),
+			type: "POST",
+			success: function (result) {
+				console.log(result.code);
+				if (result.code == 200) {
+					var questions=result.list;
+					window.sessionStorage.setItem('list',JSON.stringify(questions));
+					window.sessionStorage.setItem("item","0");
+					sessionStorage.setItem("error","@");
+					window.location.href = "http://112.126.85.136:8088/test.html";
+					//window.location.href = "http://localhost:8088/test.html";
+
+				} else {
+					alert(result.message);
+				}
+			}
+		});
+
+	}
+</script>
+<body>
+<div class="container">
+
+</div>
+<!-- <div style="text-align: center; margin-top: 0.8rem;">
+    <button type="button" class="btn btn-danger">继续测试</button>
+    <button type="button" class="btn btn-default">返回首页</button>
+</div> -->
+<div class="panel panel-danger" style="margin-left: 1.5rem;margin-right: 1.5rem;margin-top: 30%">
+	<div class="panel-heading">
+		<h3 class="panel-title">测试平均分统计</h3>
+	</div>
+	<div class="panel-body">
+		尊敬的:
+		<span id="user_label"></span>
+		您共做
+		<span id="allpaper"></span>
+		套卷,平均分为
+		<span id="allaverage"></span>
+		分,总分为
+		<span id="sum"></span>
+		分。
+	</div>
+	<div class="panel-body">
+		<table class="table table-bordered">
+			<caption>班级排名前三的平均分和总得分</caption>
+			<tr>
+			<td class="active" width="26%" ><b>平均分</b></td>
+			<td>
+				<span ></span>
+			</td>
+			<td class="active" width="26%"><b>总分</b></td>
+			<td>
+				<span ></span>
+			</td>
+
+			</tr>
+			<tr>
+				<td class="active" width="26%" ><b>第一名</b></td>
+				<td>
+					<span id="ave_first"></span>
+				</td>
+				<td class="active" width="26%"><b>第一名</b></td>
+				<td>
+					<span id="total_first"></span>
+				</td>
+
+			</tr>
+			<tr>
+				<td class="active" width="26%" ><b>第二名</b></td>
+				<td>
+					<span id="ave_second"></span>
+				</td>
+				<td class="active" width="26%"><b>第二名</b></td>
+				<td>
+					<span id="total_second"></span>
+				</td>
+
+			</tr>
+			<tr>
+				<td class="active" width="26%" ><b>第三名</b></td>
+				<td>
+					<span id="ave_final"></span>
+				</td>
+				<td class="active" width="26%"><b>第三名</b></td>
+				<td>
+					<span id="total_final"></span>
+				</td>
+
+			</tr>
+		</table>
+	</div>
+<!--	<div class="panel-body">-->
+<!--		班级第二名平均分:-->
+<!--		<span id="scores_second"></span>-->
+<!--	</div>-->
+<!--	<div class="panel-body">-->
+<!--		班级第三名平均分:-->
+<!--		<span id="scores_final"></span>-->
+
+<!--	</div>-->
+</div>
+<footer class="footer navbar-fixed-bottom ">
+	<div class="col-xs-6 col-xs-offset-3" style="padding: 0; margin-bottom: 100px">
+		<button type="button" class="btn btn-info" style="width: 100%; border-radius: 0.5px 0;" onclick="returnIndex()">返回首页</button>
+	</div>
+	<!--		<div class="col-xs-6" style="padding: 0;">-->
+	<!--			<button type="button" class="btn btn-danger" style="width: 100%;border-radius: 0.5px 0;" onclick="returnTest()">继续测试</button>-->
+	<!--		</div>-->
+</footer>
+</body>
+</html>
